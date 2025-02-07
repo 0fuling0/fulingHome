@@ -1,53 +1,82 @@
-// 定义深色模式和浅色模式的颜色
-const DARK_MODE_COLOR = '#272a29';
-const LIGHT_MODE_COLOR = '#cfd2d1';
-
 // 定义背景图片和轮播图片的索引
 let currentBackgroundImageIndex = 0;
 let currentCarouselIndex = 0;
 
-// 定义背景图片和轮播图片的数组
-let backgroundImages = [
-    'img/0.jpg',
-    'img/1.jpg',
-    'img/2.jpg',
-    'img/3.jpg',
-    'img/4.jpg',
-    'img/5.jpg'
-];
-let carouselImages = [
-    'img/ComfyUI_00122_.png',
-    'img/ComfyUI_00121_.png',
-    'img/ComfyUI_00094_.png',
-    'img/ComfyUI_00086_.png',
-    'img/ComfyUI_00079_.png',
-    'img/ComfyUI_00082_.png',
-    'img/ComfyUI_00085_.png'
-];
+// 定义背景图片和轮播图片的数组（初始为空，将从配置文件加载）
+let backgroundImages = [];
+let carouselImages = [];
 
 // 定义自动轮播和背景图片切换的定时器
 let autoSlideInterval;
 let backgroundImageInterval;
 
+// 立即执行的深色模式初始化
+(function() {
+    let darkMode = false;
+    const html = document.documentElement;
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // 按优先级检查深色模式状态
+    if (localStorage.getItem('darkMode') !== null) {
+        darkMode = localStorage.getItem('darkMode') === 'true';
+    } else if (prefersDarkMode) {
+        darkMode = true;
+    }
+    
+    // 立即应用主题
+    if (darkMode) {
+        html.classList.add('dark-mode');
+        // 深色模式下的卡片背景色
+        metaTheme.setAttribute('content', 'rgba(38, 38, 38, 0.25)');
+    } else {
+        html.classList.add('light');
+        // 浅色模式下的卡片背景色
+        metaTheme.setAttribute('content', 'rgba(255, 255, 255, 0.4)');
+    }
+})();
+
 // 页面加载时的事件处理
 window.addEventListener('load', function () {
-    // adjustFooter();
+    // 移除 adjustFooter 调用
 });
 
 // DOM内容加载完成时的事件处理
 document.addEventListener('DOMContentLoaded', function () {
-    showLoading();
-    
+    // 当页面加载完成后，延迟一小段时间再隐藏加载动画
+    setTimeout(() => {
+        const loadingContainer = document.querySelector('.loading-container');
+        if (loadingContainer) {
+            loadingContainer.classList.add('fade-out');
+            // 动画结束后移除加载容器
+            setTimeout(() => {
+                loadingContainer.remove();
+            }, 500);
+        }
+    }, 1000); // 可以调整这个时间，控制加载动画的最短显示时间
+
     // 首先初始化基本功能
-    setInitialDarkMode();
     updateClock();
-    initBackgroundImage();
     
     // 加载配置
     fetch('config.json')
         .then(response => response.json())
         .then(config => {
             window.siteConfig = config;
+            
+            // 从配置文件加载图片数组
+            if (config.backgroundImages && Array.isArray(config.backgroundImages.images)) {
+                backgroundImages = config.backgroundImages.images;
+            }
+            initBackgroundImage();
+            startBackgroundSlideshow();
+            
+            if (config.carousel && Array.isArray(config.carousel.images)) {
+                carouselImages = config.carousel.images;
+                // 设置轮播图切换间隔
+                clearInterval(autoSlideInterval);
+                autoSlideInterval = setInterval(nextSlide, config.carousel.interval || 10000);
+            }
             
             // 初始化网站
             initSiteWithConfig(config);
@@ -61,35 +90,12 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // 在所有内容加载完成后初始化其他功能
             initHitokoto();
-            if (config.carousel) {
-                carouselImages = config.carousel.images;
-                initCarousel();
-                startAutoSlide();
-            }
+            initCarousel();
         })
         .catch(error => {
             console.error('Error loading configuration:', error);
-        })
-        .finally(() => {
-            hideLoading();
         });
 });
-
-// 显示加载动画
-function showLoading() {
-    document.querySelector('.loading-container').style.display = 'flex';
-}
-showLoading();
-
-// 隐藏加载动画
-function hideLoading() {
-    document.querySelector('.loading-container').style.display = 'none';
-}
-
-// 删除原有的 adjustFooter 函数及其调用
-// function adjustFooter() { /* ...existing code... */ }
-// window.addEventListener('resize', adjustFooter);
-// window.addEventListener('load', function () { adjustFooter(); });
 
 // 初始化背景图片
 function initBackgroundImage() {
@@ -98,6 +104,15 @@ function initBackgroundImage() {
     if (savedIndex !== null) {
         currentBackgroundImageIndex = parseInt(savedIndex);
     }
+    
+    // 预加载所有背景图片
+    if (backgroundImages && backgroundImages.length > 0) {
+        backgroundImages.forEach(imgSrc => {
+            const img = new Image();
+            img.src = imgSrc;
+        });
+    }
+    
     updateBackgroundImage();
     body.addEventListener('transitionend', function () {
         body.style.transition = '';
@@ -106,10 +121,23 @@ function initBackgroundImage() {
 
 // 更新背景图片
 function updateBackgroundImage() {
+    if (!backgroundImages || backgroundImages.length === 0) return;
+    
     const body = document.body;
-    body.style.transition = 'background-image 1.5s ease';
-    body.style.backgroundImage = `url('${backgroundImages[currentBackgroundImageIndex]}')`;
-    localStorage.setItem('backgroundImageIndex', currentBackgroundImageIndex);
+    const currentImage = backgroundImages[currentBackgroundImageIndex];
+    
+    // 检查图片是否已经加载
+    const img = new Image();
+    img.onload = function() {
+        body.style.transition = 'background-image 1.5s ease';
+        body.style.backgroundImage = `url('${currentImage}')`;
+        localStorage.setItem('backgroundImageIndex', currentBackgroundImageIndex);
+        
+        // 预加载下一张图片
+        const nextIndex = (currentBackgroundImageIndex + 1) % backgroundImages.length;
+        preloadNextBackgroundImage(nextIndex);
+    };
+    img.src = currentImage;
 }
 
 // 切换到下一张背景图片
@@ -119,10 +147,10 @@ function nextBackgroundImage() {
 }
 
 // 预加载下一张背景图片
-function preloadNextBackgroundImage(callback) {
-    const nextIndex = (currentBackgroundImageIndex + 1) % backgroundImages.length;
+function preloadNextBackgroundImage(nextIndex) {
+    if (!backgroundImages || backgroundImages.length === 0) return;
+    
     const img = new Image();
-    img.onload = callback;
     img.src = backgroundImages[nextIndex];
 }
 
@@ -135,6 +163,7 @@ function initCarousel() {
     }
     
     showSlide(currentCarouselIndex);
+    initCarouselIndicators(); // 添加这一行
     startAutoSlide();
     
     const carouselContainer = document.querySelector('.carousel-container');
@@ -147,8 +176,30 @@ function initCarousel() {
 // 显示指定索引的轮播图
 function showSlide(index) {
     const img = document.querySelector('.carousel-img');
-    if (!img) return; // 如果元素不存在，直接返回
-    img.src = carouselImages[index];
+    if (!img) return;
+    
+    const newImg = new Image();
+    newImg.onload = function() {
+        // 添加淡出动画
+        img.classList.add('fade-out');
+        
+        // 等待淡出动画完成后更换图片
+        setTimeout(() => {
+            img.src = carouselImages[index];
+            // 添加淡入动画
+            img.classList.remove('fade-out');
+            img.classList.add('fade-in');
+            
+            // 动画完成后移除类名
+            setTimeout(() => {
+                img.classList.remove('fade-in');
+            }, 500);
+        }, 500);
+    };
+    newImg.src = carouselImages[index];
+    
+    // 更新指示器状态
+    updateIndicators(index);
 }
 
 // 切换到下一张轮播图
@@ -176,40 +227,47 @@ function stopAutoSlide() {
 
 // 切换深色模式
 function toggleDarkMode() {
-    const isDarkMode = document.body.classList.toggle('dark-mode');
-    updateThemeColor(isDarkMode);
+    const html = document.documentElement;
+    const isDarkMode = !html.classList.contains('dark-mode');
+    
+    if (isDarkMode) {
+        html.classList.remove('light');
+        html.classList.add('dark-mode');
+    } else {
+        html.classList.remove('dark-mode');
+        html.classList.add('light');
+    }
+    
     localStorage.setItem('darkMode', isDarkMode);
+    setThemeColor();
 }
 
-// 更新主题颜色
-function updateThemeColor(isDarkMode) {
-    const themeColorMeta = document.getElementById('theme-color-meta');
-    themeColorMeta.content = isDarkMode ? DARK_MODE_COLOR : LIGHT_MODE_COLOR;
-}
-
-// 设置初始的深色模式
-function setInitialDarkMode() {
-    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const storedDarkMode = localStorage.getItem('darkMode');
-    if (storedDarkMode === 'true' || (storedDarkMode === null && prefersDarkMode)) {
-        document.body.classList.add('dark-mode');
-        updateThemeColor(true);
-        localStorage.setItem('darkMode', true);
+// 监听系统主题变化
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+darkModeMediaQuery.addEventListener('change', (e) => {
+    const isDarkMode = e.matches;
+    const html = document.documentElement;
+    
+    if (isDarkMode) {
+        html.classList.remove('light');
+        html.classList.add('dark-mode');
     } else {
-        updateThemeColor(false);
+        html.classList.remove('dark-mode');
+        html.classList.add('light');
     }
-}
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (e.matches) {
-        document.body.classList.add('dark-mode');
-        updateThemeColor(true);
-        localStorage.setItem('darkMode', true);
-    } else {
-        document.body.classList.remove('dark-mode');
-        updateThemeColor(false);
-        localStorage.setItem('darkMode', false);
-    }
+    setThemeColor();
 });
+
+function setThemeColor() {
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (document.documentElement.classList.contains('dark-mode')) {
+        // 使用深色模式下的卡片背景色
+        metaTheme.setAttribute('content', 'rgba(38, 38, 38, 0.25)');
+    } else {
+        // 使用浅色模式下的卡片背景色
+        metaTheme.setAttribute('content', 'rgba(255, 255, 255, 0.4)');
+    }
+}
 
 // 更新时钟
 function updateClock() {
@@ -301,17 +359,42 @@ function updateAllHitokotoContainers(content) {
 
 // 获取一言
 function getHitokoto() {
-    const url = window.siteConfig?.hitokoto?.url || 'https://v1.hitokoto.cn/';
-    return fetch(url)
-        .then(response => response.json())
+    const url = window.siteConfig?.hitokoto?.url || 'https://international.v1.hitokoto.cn/';
+    return fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Origin': window.location.origin,
+            'Referer': window.location.href
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                // 如果在国际版失败，尝试使用备用API
+                if (url.includes('international')) {
+                    const fallbackUrl = 'https://v1.hitokoto.cn/';
+                    console.log('Falling back to regular API:', fallbackUrl);
+                    return fetch(fallbackUrl, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            currentHitokoto = data.from ? 
+            const content = data.from ? 
                 `『${data.hitokoto}』—— ${data.from}` : 
                 data.hitokoto;
-            updateAllHitokotoContainers(currentHitokoto);
+            updateAllHitokotoContainers(content);
         })
         .catch(error => {
-            console.error('Error fetching hitokoto:', error);
+            console.warn('Error fetching hitokoto:', error);
             updateAllHitokotoContainers(window.siteConfig?.hitokoto?.messages?.error || '获取一言失败，请稍后再试...');
         });
 }
@@ -384,8 +467,7 @@ function showSection(sectionId) {
     }
     const mainElement = document.querySelector('main');
     mainElement.style.columnCount = (sectionId === 'navpage') ? '1' : '';
-    // 删除或注释掉 footer 调整调用
-    // adjustFooter();
+    // 移除 adjustFooter 调用
 }
 
 // 更新页眉文本
@@ -641,10 +723,10 @@ function initSiteWithConfig(config) {
 
 // 渲染项目列表
 function renderProjects(projects) {
-    // 更精确选择 homepage 下的列表
     const projectList = document.querySelector('#homepage .project-list');
     if (!projectList) {
-        console.warn('No .project-list found in #homepage, skipping render');
+        console.debug('No .project-list found in #homepage, waiting for DOM updates...');
+        // 可以选择延迟重试或者忽略
         return;
     }
     projectList.innerHTML = projects.map(project => `
@@ -743,16 +825,26 @@ function renderHomepageCards(cards) {
                     <h3><i class="fas ${card.icon}"></i> ${card.title}</h3><br>
                     <ul>
                         ${card.showVisits ? `
-                            <li><strong>本站总访问量：</strong><span id="busuanzi_value_site_pv"></span> 次</li>
-                            <li><strong>本站总访客数：</strong><span id="busuanzi_value_site_uv"></span> 人</li>
+                            <li><strong>本站总访问量：</strong><span id="busuanzi_container_site_pv" style="display:none">
+                                <span id="busuanzi_value_site_pv">0</span>
+                            </span> 次</li>
+                            <li><strong>本站总访客数：</strong><span id="busuanzi_container_site_uv" style="display:none">
+                                <span id="busuanzi_value_site_uv">0</span>
+                            </span> 人</li>
                         ` : ''}
                         ${card.showRuntime ? `
                             <li><div id="runtime-info-container"></div></li>
                         ` : ''}
                     </ul>
                 `;
-                // 立即初始化运行时间
-                if (card.showRuntime && window.siteConfig && window.siteConfig.siteInfo && window.siteConfig.siteInfo.startDate) {
+                
+                // 卡片渲染完成后重新加载统计脚本
+                if (card.showVisits) {
+                    refreshBusuanzi();
+                }
+                
+                // 初始化运行时间
+                if (card.showRuntime && window.siteConfig?.siteInfo?.startDate) {
                     initRuntimeInfo(window.siteConfig);
                 }
                 break;
@@ -827,10 +919,32 @@ function renderHomepageCards(cards) {
     }
 }
 
-// DOM内容加载完成时的事件处理
+// 添加刷新统计数据的函数
+function refreshBusuanzi() {
+    if (typeof window.busuanzi_refresh === 'function') {
+        window.busuanzi_refresh();
+    } else {
+        // 如果脚本未加载，重新加载脚本
+        const script = document.createElement('script');
+        script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+        script.async = true;
+        document.body.appendChild(script);
+        
+        // 监听脚本加载完成
+        script.onload = function() {
+            // 等待一点时间让统计初始化
+            setTimeout(() => {
+                const pv = document.getElementById('busuanzi_container_site_pv');
+                const uv = document.getElementById('busuanzi_container_site_uv');
+                if (pv) pv.style.display = '';
+                if (uv) uv.style.display = '';
+            }, 1000);
+        };
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     // 初始化基本功能
-    setInitialDarkMode();
     updateClock();
     initBackgroundImage();
     initHitokoto();
@@ -850,8 +964,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => {
             console.error('Error loading config:', error);
         });
-        
-    hideLoading();
 });
 
 // 加载卡片内容
@@ -920,4 +1032,72 @@ function initializeCardInteractions() {
             switchToCard(cardNumber);
         });
     });
+}
+// 初始化卡片交互
+function initializeCardInteractions() {
+    const cardItems = document.querySelectorAll('.cardItem');
+    cardItems.forEach(card => {
+        card.addEventListener('click', function() {
+            const cardNumber = parseInt(this.id.replace('card', ''), 10);
+            switchToCard(cardNumber);
+        });
+    });
+}
+
+function startBackgroundSlideshow() {
+    if (!backgroundImages || backgroundImages.length === 0) return;
+    
+    if (backgroundImageInterval) clearInterval(backgroundImageInterval);
+    const interval = window.siteConfig?.backgroundImages?.interval || 30000;
+    
+    // 立即显示第一张图片
+    updateBackgroundImage();
+    
+    // 设置定时器
+    backgroundImageInterval = setInterval(() => {
+        currentBackgroundImageIndex = (currentBackgroundImageIndex + 1) % backgroundImages.length;
+        updateBackgroundImage();
+    }, interval);
+}
+
+// 更新指示器状态
+function updateIndicators(index) {
+    const dots = document.querySelectorAll('.carousel-dot');
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+    });
+}
+
+// 初始化轮播指示器
+function initCarouselIndicators() {
+    if (!carouselImages || !carouselImages.length) return;
+    
+    const container = document.querySelector('.carousel-container');
+    if (!container) return;
+    
+    // 移除已存在的指示器
+    const oldIndicators = container.querySelector('.carousel-indicators');
+    if (oldIndicators) {
+        oldIndicators.remove();
+    }
+    
+    // 创建新的指示器容器
+    const indicators = document.createElement('div');
+    indicators.className = 'carousel-indicators';
+    
+    // 为每张图片创建一个指示器圆点
+    carouselImages.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot';
+        if (index === currentCarouselIndex) {
+            dot.classList.add('active');
+        }
+        dot.addEventListener('click', () => {
+            currentCarouselIndex = index;
+            showSlide(index);
+        });
+        indicators.appendChild(dot);
+    });
+    
+    container.appendChild(indicators);
 }

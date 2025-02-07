@@ -28,24 +28,25 @@
     },
     "carousel": {
         "images": [
-            "img/ComfyUI_00122_.png",
-            "img/ComfyUI_00121_.png",
-            "img/ComfyUI_00094_.png",
-            "img/ComfyUI_00086_.png",
-            "img/ComfyUI_00079_.png",
-            "img/ComfyUI_00082_.png",
-            "img/ComfyUI_00085_.png"
+            "img/ComfyUI_00122_.webp",
+            "img/ComfyUI_00121_.webp",
+            "img/ComfyUI_00094_.webp",
+            "img/ComfyUI_00086_.webp",
+            "img/ComfyUI_00079_.webp",
+            "img/ComfyUI_00082_.webp",
+            "img/ComfyUI_00085_.webp"
         ],
         "interval": 10000
     },
     "backgroundImages": {
         "images": [
-            "img/0.jpg",
-            "img/1.jpg",
-            "img/2.jpg",
-            "img/3.jpg",
-            "img/4.jpg",
-            "img/5.jpg"
+            "https://api.xsot.cn/bing?jump=true",
+            "img/0.webp",
+            "img/1.webp",
+            "img/2.webp",
+            "img/3.webp",
+            "img/4.webp",
+            "img/5.webp"
         ],
         "interval": 10000
     },
@@ -175,7 +176,7 @@
         ]
     },
     "hitokoto": {
-        "url": "https://v1.hitokoto.cn/",
+        "url": "https://international.v1.hitokoto.cn/",
         "interval": 10000,
         "messages": {
             "loading": "正在加载一言...",
@@ -183,4 +184,4 @@
             "default": "你好，又见面了！"
         }
     }
-}
+    }

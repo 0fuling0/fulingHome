@@ -1,3 +1,53 @@
+:root {
+    color-scheme: light dark;
+    /* 浅色模式变量 */
+    --background-color: #cfd2d1;
+    --font-color: #444;
+    --glass-background: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    
+    /* 通用颜色变量 */
+    --primary-color: rgba(33, 150, 243, 0.6);
+    --secondary-color: rgba(21, 101, 192, 0.6);
+    --tertiary-color: rgba(13, 71, 161, 0.6);
+    --dark-mode-color: rgba(243, 156, 18, 0.6);
+    --dark-mode-hover: rgba(224, 123, 0, 0.6);
+    --dark-mode-active: rgba(179, 102, 0, 0.6);
+    --font-color: #444;
+
+    /* Footer 变量 */
+    --footer-background: rgba(255, 255, 255, 0.5);
+    --footer-border-radius: 12px 12px 0 0;
+    --footer-blur: blur(20px);
+    --footer-transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+
+    /* 按钮变量 */
+    --button-width: 32px;
+    --button-height: 32px;
+    --button-size: 1rem;
+    --button-radius: 12px;
+    --button-transition: background-color 0.3s ease, transform 0.2s ease;
+
+    /* 更新全局变量 */
+    --blur-amount: 16px;
+    --glass-background: rgba(255, 255, 255, 0.4);
+    --glass-background-dark: rgba(38, 38, 38, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* 深色模式变量 */
+:root.dark-mode {
+    --background-color: #272a29;
+    --font-color: #eee; /* 统一暗色模式字体颜色 */
+    --glass-background: rgba(38, 38, 38, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary-color: rgba(243, 156, 18, 0.6);
+    --secondary-color: rgba(224, 123, 0, 0.6);
+    --tertiary-color: rgba(179, 102, 0, 0.6);
+}
+
 /* 重置默认样式，确保页面样式一致性 */
 body,
 h1,
@@ -10,20 +60,11 @@ ul {
     box-sizing: border-box;
 }
 
-/* 定义全局变量以便统一使用颜色 */
-:root {
-    --primary-color: rgba(33, 150, 243, 0.6);
-    --secondary-color: rgba(21, 101, 192, 0.6);
-    --tertiary-color: rgba(13, 71, 161, 0.6);
-    --dark-mode-color: rgba(243, 156, 18, 0.6);
-    --dark-mode-hover: rgba(224, 123, 0, 0.6);
-    --dark-mode-active: rgba(179, 102, 0, 0.6);
-    --font-color: #444;
-}
-
-/* 开启深色模式时的字体颜色 */
-body.dark-mode {
-    --font-color: #eeeeeede;
+/* 新增：全局优化 */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: always;
 }
 
 /* 设置全局的样式 */
@@ -32,40 +73,54 @@ body {
     font-family: 'LXGWWenKaiGBScreen', sans-serif;
     color: var(--font-color);
     transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: #cfd2d1;
+    background-color: var(--background-color);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-}
-
-/* 深色模式的背景颜色设置 */
-body.dark-mode {
-    background-color: #272a29;
-}
-
-/* 页面加载样式，优化视觉体验 */
-.loading-container {
-    position: fixed;
-    width: 100%;
-    height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(20px);
-    z-index: 9999;
-    animation: bgPulse 3s infinite;
+    flex-direction: column;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    transition: background-image 1.5s ease;
+}
+
+/* 新增：统一表单与交互控件样式 */
+input, button, textarea {
+    font-family: inherit;
+    color: inherit;
 }
 
 /* 自定义按钮样式，适用于不同的交互场景 */
 .button {
+    white-space: nowrap;
     padding: 10px 15px;
     font-size: 1.1rem;
     cursor: pointer;
+    border: none;
     border-radius: 10px;
+    outline: none;
     background-color: var(--primary-color);
     color: #fff;
     transition: var(--button-transition);
+}
+.button:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+.button:active {
+    background-color: var(--tertiary-color);
+}
+html.dark-mode .button {
+    background-color: var(--dark-mode-color);
+}
+html.dark-mode .button:hover {
+    background-color: var(--dark-mode-hover);
+}
+html.dark-mode .button:active {
+    background-color: var(--dark-mode-active);
 }
 
 /* 旋转动画，用于加载指示器 */
@@ -86,63 +141,34 @@ body.dark-mode {
     border: none;
     position: relative;
 }
-
-/* 鼠标悬停时导航按钮的效果 */
+.navButton::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
 .navButton:hover::before {
     background-color: var(--font-color);
 }
-
-/* 重置一些默认样式，确保页面的一致性 */
-body,
-h1,
-h2,
-h3,
-p,
-ul {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.navButton.current::before {
+    background-color: var(--primary-color);
 }
-
-:root {
-    --primary-color: rgba(33, 150, 243, 0.6);
-    --secondary-color: rgba(21, 101, 192, 0.6);
-    --tertiary-color: rgba(13, 71, 161, 0.6);
-    --dark-mode-color: rgba(243, 156, 18, 0.6);
-    --dark-mode-hover: rgba(224, 123, 0, 0.6);
-    --dark-mode-active: rgba(179, 102, 0, 0.6);
-    --font-color: #444;
-}
-
-body.dark-mode {
-    --font-color: #eeeeeede;
-}
-
-/* 全局样式设置，包括背景、字体等 */
-body {
-    min-height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    font-family: 'LXGWWenKaiGBScreen', sans-serif;
-    color: #444;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    position: relative;
-    background-color: #cfd2d1;
+html.dark-mode .navButton.current::before {
+    background-color: var(--dark-mode-color);
 }
 
 /* 字体自定义 */
 @font-face {
     font-family: 'LXGWWenKaiGBScreen';
-    src: url('https://gcore.jsdelivr.net/gh/0fuling0/mysource@main/fonts/LXGWWenKaiGBScreen.woff2') format('woff2');
+    src: local('LXGWWenKaiGBScreen'),
+         url('https://gcore.jsdelivr.net/gh/0fuling0/mysource@main/fonts/LXGWWenKaiGBScreen.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-}
-
-body.dark-mode {
-    background-color: #272a29;
-    color: #eeeeeede;
+    font-display: swap;  /* 使用 swap 策略优化字体加载 */
 }
 
 body::before {
@@ -158,278 +184,104 @@ body::before {
     background-repeat: no-repeat;
     z-index: -1;
 }
-
-body.dark-mode:before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
-    z-index: -1;
+html.dark-mode::before {
+    background-color: rgba(0, 0, 0, 0.5); /* 调整为黑色半透明 */
 }
-
-/* 可选: 为深色模式添加平滑过渡效果 */
-body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-body.dark-mode {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 新的加载页面样式 */
-.loading-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(20px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: background-color 0.3s ease;
-}
-
-.loading-container {
-    background: rgba(255, 255, 255, 0.5);
-}
-
-body.dark-mode .loading-container {
-    background: rgba(38, 38, 38, 0.1);
-}
-
-.loading-spinner-wrapper {
-    position: relative;
-    width: 100px;
-    height: 100px;
-}
-
-.loading-spinner {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    animation: spin 1s linear infinite;
-}
-
-.loading-spinner:before,
-.loading-spinner:after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    animation: spin linear infinite;
-}
-
-.loading-spinner:before {
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    bottom: 5px;
-    animation-duration: 2s;
-}
-
-.loading-spinner:after {
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    bottom: 15px;
-    animation-duration: 1.5s;
-}
-
-.loading-spinner {
-    border-top-color: var(--primary-color);
-}
-
-.loading-spinner:before {
-    border-top-color: var(--primary-color);
-}
-
-.loading-spinner:after {
-    border-top-color: var(--primary-color);
-}
-
-body.dark-mode .loading-spinner {
-    border-top-color: var(--dark-mode-color);
-}
-
-body.dark-mode .loading-spinner:before {
-    border-top-color: var(--dark-mode-color);
-}
-
-body.dark-mode .loading-spinner:after {
-    border-top-color: var(--dark-mode-color);
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.loading-text {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    font-family: 'LXGWWenKaiGBScreen', sans-serif;
-    color: var(--font-color);
-    text-align: center;
-    opacity: 0.8;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
+html.dark-mode body::before {
+    filter: brightness(0.6);
 }
 
 /* 头部样式 */
-/* 开始头部样式 */
 header {
     padding-top: 3px;
-    /* 上边距 */
     padding-bottom: 9px;
-    /* 下边距 */
     text-align: center;
-    /* 文本居中对齐 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    /* 阴影效果，颜色为黑色透明 */
-    background-color: rgba(255, 255, 255, 0.5);
-    /* 半透明白色背景 */
+    box-shadow: var(--glass-shadow);
+    background: var(--glass-background);
+    width: calc(100% - 20px);
+    max-width: 1300px;
+    margin: 0 auto 10px auto;
     position: sticky;
-    /* 固定定位，随滚动粘在顶部 */
     top: 0;
     z-index: 2;
-    /* 设置在正常文档流下，位于其他元素之上 */
-    margin: 0 auto;
-    /* 左右自动居中 */
-    max-width: 1300px;
-    /* 最大宽度为1300像素 */
     border-radius: 0 0 12px 12px;
-    /* 圆角边框，仅在底部有圆角 */
-    backdrop-filter: blur(20px);
-    /* 模糊背景，可根据需要调整 */
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
     transition: transform 0.3s ease-in-out, background-color 0.3s ease;
-    /* 添加过渡效果 */
     box-sizing: border-box;
-    /* 使用border-box盒模型 */
+}
+
+html.dark-mode header {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
 }
 
 header p.motto {
     margin-bottom: 10px;
-    /* 根据需要调整上边距的值 */
 }
 
 /* 导航链接样式 */
 header a {
     color: var(--font-color);
-    /* 设置链接颜色 */
     text-decoration: none;
     margin: 0 10px;
-    /* 在链接之间添加间距 */
     transition: color 0.3s ease;
-    /* 添加颜色过渡效果 */
 }
 
 /* 鼠标悬停时更改链接颜色和添加底部边框效果 */
 header a:hover {
     color: var(--font-color);
-    /* 更改为你想要的悬停颜色 */
     border-bottom: 2px solid var(--font-color);
-    /* 添加底部边框效果 */
 }
 
 header:hover {
     transform: scale(1.03);
-    /* 悬停时放大1.03倍 */
 }
 
 /* 在较小屏幕上为头部添加外边距 */
 @media (max-width: 1320px) {
     header {
-        margin: 0 10px;
-        /* 在左右各添加10像素外边距 */
+        margin: 0 10px 10px 10px;
     }
 }
 
 /* 深色模式下的头部样式 */
-body.dark-mode header {
+html.dark-mode header {
     background-color: rgba(38, 38, 38, 0.1);
-    /* 深色模式下的半透明背景 */
 }
 
 header::before {
     content: '';
-    /* 伪元素内容为空 */
     position: absolute;
-    /* 绝对定位，相对于头部定位 */
     top: 0;
-    /* 伪元素顶部对齐头部顶部 */
     left: 0;
-    /* 伪元素左侧对齐头部左侧 */
     right: 0;
-    /* 伪元素右侧对齐头部右侧 */
     bottom: 0;
-    /* 伪元素底部对齐头部底部 */
     border-radius: 12px;
-    /* 圆角边框，与头部相同 */
     background-color: rgba(0, 0, 0, 0);
-    /* 背景颜色为透明 */
     pointer-events: none;
-    /* 伪元素不响应鼠标事件 */
     transition: background-color 0.3s ease;
-    /* 背景颜色过渡效果 */
     z-index: -1;
-    /* 设置为负值，将遮罩置于头部下层 */
 }
 
 header:hover::before {
     content: '';
-    /* 伪元素内容为空 */
     position: absolute;
-    /* 绝对定位，相对于头部定位 */
     top: 0;
-    /* 伪元素顶部对齐头部顶部 */
     left: 0;
-    /* 伪元素左侧对齐头部左侧 */
     right: 0;
-    /* 伪元素右侧对齐头部右侧 */
     bottom: 0;
-    /* 伪元素底部对齐头部底部 */
     border-radius: 12px;
-    /* 圆角边框，与头部相同 */
     background-color: rgba(255, 255, 255, 0.3);
-    /* 头部悬停时的白色半透明遮罩 */
     pointer-events: none;
-    /* 伪元素不响应鼠标事件 */
     z-index: -1;
-    /* 设置为负值，将遮罩置于头部下层 */
     transition: background-color 0.3s ease;
-    /* 背景颜色过渡效果 */
 }
 
 /* 深色模式下头部悬停时的遮罩效果 */
-body.dark-mode header:hover::before {
+html.dark-mode header:hover::before {
     background-color: rgba(0, 0, 0, 0.3);
-    /* 头部悬停时的黑色半透明遮罩 */
 }
 
 /* 结束头部样式 */
@@ -439,16 +291,23 @@ body.dark-mode header:hover::before {
     max-width: 1300px;
     margin: 20px auto;
     overflow: visible;
+    flex: 1;
+    position: relative;
+    padding: 10px;
 }
 
 /* 主要内容区域样式 */
 main {
-    padding: 10px;
     background-color: transparent;
-    column-count: 3;
-    /* 默认三列布局 */
-    column-gap: 20px;
-    /* 列之间的间隔 */
+    column-count: 3; /* 默认三列布局 */
+    column-gap: 20px; /* 列之间的间隔 */
+    min-height: 0; /* 添加这行，防止内容区域过高 */
+}
+
+/* 在显示导航页时的特殊处理 */
+main:has(#navpage:not([style*="display: none"])) {
+    height: auto;
+    min-height: 0;
 }
 
 /* 使用媒体查询实现响应式布局 */
@@ -456,7 +315,6 @@ main {
 @media (max-width: 720px) {
     main {
         column-count: 1;
-        /* 单列布局 */
     }
 }
 
@@ -464,7 +322,6 @@ main {
 @media (min-width: 721px) and (max-width: 1200px) {
     main {
         column-count: 2;
-        /* 两列布局 */
     }
 }
 
@@ -472,28 +329,31 @@ main {
 @media (min-width: 1201px) {
     main {
         column-count: 3;
-        /* 三列布局 */
     }
 }
 
 /* 卡片样式 */
 .card {
     break-inside: avoid;
-    /* 防止卡片在列中被断开 */
     margin-bottom: 20px;
-    /* 设置卡片间隔 */
-}
-
-/* 卡片样式 */
-.card {
     position: relative;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    background-color: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(20px);
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+    box-shadow: var(--glass-shadow);
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s ease-in-out,
+                background-color 0.3s ease,
+                backdrop-filter 0.3s ease,
+                box-shadow 0.3s ease;
     box-sizing: border-box;
+}
+
+html.dark-mode .card {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
 }
 
 .card::before {
@@ -507,10 +367,6 @@ main {
     background-color: rgba(0, 0, 0, 0);
     pointer-events: none;
     transition: background-color 0.3s ease;
-}
-
-body.dark-mode .card {
-    background-color: rgba(38, 38, 38, 0.1);
 }
 
 .card:hover::before {
@@ -527,12 +383,17 @@ body.dark-mode .card {
     transition: background-color 0.3s ease;
 }
 
-body.dark-mode .card:hover::before {
+html.dark-mode .card:hover::before {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
 .card:hover {
-    transform: scale(1.03);
+    transform: translateY(-5px);
+    background: var(--glass-background);
+    backdrop-filter: blur(calc(var(--blur-amount) * 1.5));
+    -webkit-backdrop-filter: blur(calc(var(--blur-amount) * 1.5));
+    box-shadow: var(--glass-shadow),
+                0 10px 40px -10px rgba(31, 38, 135, 0.4);
 }
 
 /* 列表样式统一设置 */
@@ -550,21 +411,21 @@ body.dark-mode .card:hover::before {
 .hitokoto-container {
     display: flex;
     justify-content: center;
-    /* Centers text horizontally */
     align-items: center;
-    /* Centers text vertically */
     text-align: center;
-    /* Center text within the container */
 }
 
 .clock {
     text-align: center;
-    /*   height: 150px;   */
 }
 
 .clock-date {
     font-size: 1.5rem;
     color: #555;
+}
+
+html.dark-mode .clock-date {
+    color: #ccc;
 }
 
 .clock-time {
@@ -578,7 +439,7 @@ body.dark-mode .card:hover::before {
     justify-content: center;
 }
 
-body.dark-mode .clock-time {
+html.dark-mode .clock-time {
     color: #eee;
 }
 
@@ -592,7 +453,7 @@ body.dark-mode .clock-time {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-body.dark-mode .profile img {
+html.dark-mode .profile img {
     filter: brightness(0.8);
 }
 
@@ -605,19 +466,6 @@ body.dark-mode .profile img {
     flex-grow: 1;
 }
 
-.button {
-    white-space: nowrap;
-    padding: 10px 15px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    outline: none;
-    background-color: var(--primary-color);
-    color: #fff;
-    transition: var(--button-transition);
-}
-
 .buttons {
     display: flex;
     flex-direction: column;
@@ -627,35 +475,13 @@ body.dark-mode .profile img {
     align-items: flex-end;
 }
 
-.button:hover {
-    background-color: var(--secondary-color);
-    transform: scale(1.05);
-}
-
-.button:active {
-    background-color: var(--tertiary-color);
-}
-
-body.dark-mode .button {
-    background-color: var(--dark-mode-color);
-    margin-right: 0;
-}
-
-body.dark-mode .button:hover {
-    background-color: var(--dark-mode-hover);
-}
-
-body.dark-mode .button:active {
-    background-color: var(--dark-mode-active);
-}
-
-.button,
-.button:hover,
-.button:active,
-body.dark-mode .button,
-body.dark-mode .button:hover,
-body.dark-mode .button:active {
+.buttons a {
     text-decoration: none;
+}
+
+.buttons a:hover {
+    text-decoration: none;
+    border-bottom: none;
 }
 
 /* Profile 卡片样式结束 */
@@ -700,7 +526,7 @@ body.dark-mode .button:active {
     border-bottom: none;
 }
 
-body.dark-mode .project a {
+html.dark-mode .project a {
     color: #eeeeeede;
 }
 
@@ -741,15 +567,15 @@ body.dark-mode .project a {
     border-bottom: none;
 }
 
-body.dark-mode .contact-options {
+html.dark-mode .contact-options {
     color: #eee;
 }
 
-body.dark-mode .contact-options a {
+html.dark-mode .contact-options a {
     color: #eee;
 }
 
-body.dark-mode .contact-options a:hover {
+html.dark-mode .contact-options a:hover {
     text-decoration: underline;
     border-bottom: none;
 }
@@ -760,7 +586,6 @@ body.dark-mode .contact-options a:hover {
 .carousel-card {
     position: relative;
     padding-bottom: 210px;
-    /* 设置纵横比 (2:1) */
 }
 
 /* 轮播容器样式 */
@@ -772,7 +597,11 @@ body.dark-mode .contact-options a:hover {
     bottom: -20px;
     overflow: hidden;
     border-radius: 12px;
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); */
+    background: var(--glass-background-dark);
+}
+
+html.dark-mode .carousel-container {
+    background: var(--glass-background);
 }
 
 /* 图片样式 */
@@ -780,94 +609,76 @@ body.dark-mode .contact-options a:hover {
     filter: brightness(1.0);
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* 确保图像覆盖整个容器 */
-    object-position: center;
-    /* 将图像居中放置在容器内 */
-}
-
-body.dark-mode .carousel-img {
-    filter: brightness(0.8);
+    transform: scale(1);
+    opacity: 1;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    object-fit: cover;  /* 新增，裁剪图片而非拉伸 */
 }
 
 /* 轮播按钮样式 */
 .prev-btn,
 .next-btn {
     z-index: 2;
-    /* Add this line */
     position: absolute;
     bottom: -20px;
     height: 250px;
-    /* transform: translateY(-50%); */
     font-size: 1.2rem;
-    background: none;
-    border: none;
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
     cursor: pointer;
-    color: #333;
-    transition: color 0.3s;
-    /* 添加颜色渐变过渡效果 */
-    background-color: rgba(255, 255, 255, 0.4);
-    /* 背景颜色 */
-    backdrop-filter: blur(20px);
+    color: var(--font-color);
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
     padding: 0px 10px;
-    /* 内边距 */
-    transition: background-color 0.3s;
-    /* 添加颜色渐变过渡效果 */
+}
+
+html.dark-mode .prev-btn,
+html.dark-mode .next-btn {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
+    color: var(--font-color);
 }
 
 .prev-btn {
     left: -20px;
     border-radius: 12px 0px 0px 12px;
-    /* 圆角 */
 }
 
 .next-btn {
     right: -20px;
     border-radius: 0px 12px 12px 0px;
-    /* 圆角 */
 }
 
 .prev-btn:hover,
 .next-btn:hover {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: var(--glass-background);
 }
 
-
-body.dark-mode .prev-btn,
-body.dark-mode .next-btn {
-    background-color: rgba(0, 0, 0, 0.4);
-    /* 背景颜色 */
-    color: #eee;
-}
-
-body.dark-mode .prev-btn:hover,
-body.dark-mode .next-btn:hover {
-    background-color: rgba(0, 0, 0, 0.6);
+html.dark-mode .prev-btn:hover,
+html.dark-mode .next-btn:hover {
+    background-color: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
 }
 
 .card.music iframe {
     filter: brightness(1.0);
 }
 
-body.dark-mode .card.music iframe {
+html.dark-mode .card.music iframe {
     filter: brightness(0.6);
-}
-
-:root {
-    --button-width: 32px;
-    --button-height: 32px;
-    --button-size: 1rem;
-    --button-radius: 12px;
-    --button-transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .back-to-top-button,
 .back-to-bottom-button,
 .dark-mode-toggle {
     position: fixed;
-    background-color: var(--primary-color);
+    background: var(--primary-color);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     color: #fff;
-    border: none;
     width: var(--button-width);
     height: var(--button-height);
     font-size: var(--button-size);
@@ -878,6 +689,13 @@ body.dark-mode .card.music iframe {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+html.dark-mode .back-to-top-button,
+html.dark-mode .back-to-bottom-button,
+html.dark-mode .dark-mode-toggle {
+    background: var(--dark-mode-color);
+    border-color: var(--glass-border-dark);
 }
 
 .back-to-top-button {
@@ -898,71 +716,61 @@ body.dark-mode .card.music iframe {
 .back-to-top-button:hover,
 .back-to-bottom-button:hover,
 .dark-mode-toggle:hover {
-    background-color: var(--secondary-color);
+    background: var(--secondary-color);
     transform: scale(1.05);
 }
 
 .back-to-top-button:active,
 .back-to-bottom-button:active,
 .dark-mode-toggle:active {
-    background-color: var(--tertiary-color);
+    background: var(--tertiary-color);
 }
 
-.dark-mode .back-to-top-button,
-.dark-mode .back-to-bottom-button,
-.dark-mode .dark-mode-toggle {
+html.dark-mode .back-to-top-button,
+html.dark-mode .back-to-bottom-button,
+html.dark-mode .dark-mode-toggle {
     background-color: var(--dark-mode-color);
 }
 
-.dark-mode .back-to-top-button:hover,
-.dark-mode .back-to-bottom-button:hover,
-.dark-mode .dark-mode-toggle:hover {
+html.dark-mode .back-to-top-button:hover,
+html.dark-mode .back-to-bottom-button:hover,
+html.dark-mode .dark-mode-toggle:hover {
     background-color: var(--dark-mode-hover);
 }
 
-.dark-mode .back-to-top-button:active,
-.dark-mode .back-to-bottom-button:active,
-.dark-mode .dark-mode-toggle:active {
+html.dark-mode .back-to-top-button:active,
+html.dark-mode .back-to-bottom-button:active,
+html.dark-mode .dark-mode-toggle:active {
     background-color: var(--dark-mode-active);
 }
 
 /* Footer 样式开始 */
 
-/* 设置根元素的变量，定义 Footer 样式的基本参数 */
-:root {
-    --footer-background: rgba(255, 255, 255, 0.5);
-    /* 背景颜色，带透明度 */
-    --footer-border-radius: 12px 12px 0 0;
-    /* 圆角边框 */
-    --footer-blur: blur(20px);
-    /* 背景模糊效果 */
-    --footer-transition: transform 0.3s ease-in-out, background-color 0.3s ease;
-    /* 过渡效果 */
-}
-
 /* 暗黑模式下的 Body 样式 */
-body.dark-mode {
+html.dark-mode {
     --footer-background: rgba(38, 38, 38, 0.1);
-    /* 暗黑模式下的背景颜色 */
 }
 
 /* 设置 Footer 样式 */
 footer {
     padding: 10px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    background-color: var(--footer-background);
-    position: absolute;
-    /* 使用绝对定位 */
-    left: 0;
-    right: 0;
-    z-index: 0;
-    margin: 0 auto;
+    box-shadow: var(--glass-shadow);
+    background: var(--glass-background);
+    width: 100%;
     max-width: 1300px;
+    margin: 10px auto 0 auto;
     border-radius: var(--footer-border-radius);
-    backdrop-filter: var(--footer-blur);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
     transition: var(--footer-transition);
     box-sizing: border-box;
+}
+
+html.dark-mode footer {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
 }
 
 /* 鼠标悬停时 Footer 的放大效果 */
@@ -986,14 +794,16 @@ footer:hover::before {
 }
 
 /* 暗黑模式下的鼠标悬停时在 Footer 上方添加半透明背景 */
-body.dark-mode footer:hover::before {
+html.dark-mode footer:hover::before {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* 在小屏幕上为 Footer 添加外边距 */
 @media (max-width: 1320px) {
     footer {
-        margin: 0 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        width: calc(100% - 20px);
     }
 }
 
@@ -1006,7 +816,7 @@ body.dark-mode footer:hover::before {
     border-radius: 12px;
     background: var(--primary-color) !important;
     border: 0px solid var(--dark-mode-hover) !important;
-    color: white !important;
+    color: white !重要;
 }
 
 .tk-extras {
@@ -1046,21 +856,21 @@ body.dark-mode footer:hover::before {
 }
 
 /* Dark Mode Styles */
-body.dark-mode .el-button {
+html.dark-mode .el-button {
     background: var(--dark-mode-color) !important;
     border: 0px solid var(--dark-mode-hover) !important;
     color: var(--font-color) !important;
 }
 
-body.dark-mode .el-button:hover {
+html.dark-mode .el-button:hover {
     background: var(--dark-mode-hover) !important;
     color: var(--tertiary-color) !important;
 }
 
-body.dark-mode .el-button--primary.is-disabled,
-body.dark-mode .el-button--primary.is-disabled:active,
-body.dark-mode .el-button--primary.is-disabled:focus,
-body.dark-mode .el-button--primary.is-disabled:hover {
+html.dark-mode .el-button--primary.is-disabled,
+html.dark-mode .el-button--primary.is-disabled:active,
+html.dark-mode .el-button--primary.is-disabled:focus,
+html.dark-mode .el-button--primary.is-disabled:hover {
     opacity: 0.4;
 }
 
@@ -1092,19 +902,16 @@ div.aplayer-pic {
     border: none !important;
     border-radius: 12px !important;
     box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
-    /* Inner shadow on all sides */
 }
 
-body.dark-mode .aplayer.aplayer-withlist .aplayer-info,
+html.dark-mode .aplayer.aplayer-withlist .aplayer-info,
 div.aplayer-pic {
     box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.3);
-    /* Inner shadow on all sides */
 }
 
 /* 主要内容区域样式 */
 .full {
     column-count: 1;
-    /* 单列布局 */
 }
 
 .search-container {
@@ -1112,13 +919,11 @@ div.aplayer-pic {
     text-align: center;
     display: flex;
     align-items: stretch;
-    /* 将内部元素拉伸以匹配容器的高度 */
     justify-content: center;
 }
 
 .search-input::placeholder {
     font-family: 'LXGWWenKaiGBScreen';
-    /* 设置字体样式 */
 }
 
 .custom-select {
@@ -1126,8 +931,6 @@ div.aplayer-pic {
     display: flex;
     align-items: stretch;
     padding: 0px;
-    /* margin-top: 0; */
-    /* margin-bottom: 0;   */
 }
 
 .select-styled {
@@ -1138,7 +941,10 @@ div.aplayer-pic {
     border: none;
     padding: 0px 9px;
     border-radius: 20px 0 0 20px;
-    background-color: #fff;
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
     color: #000;
     outline: none;
     cursor: pointer;
@@ -1146,8 +952,10 @@ div.aplayer-pic {
     z-index: 1;
 }
 
-.dark-mode .select-styled {
-    background-color: #a0a0a0;
+html.dark-mode .select-styled {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
+    color: var(--font-color);
 }
 
 .select-styled:after {
@@ -1173,11 +981,10 @@ div.aplayer-pic {
 @media only screen and (max-width: 600px) {
     .search-options {
         grid-template-columns: repeat(2, 1fr);
-        /* 单列布局 */
     }
 }
 
-.dark-mode .search-options {
+html.dark-mode .search-options {
     background-color: #a0a0a0;
 }
 
@@ -1196,15 +1003,18 @@ div.aplayer-pic {
     border: none;
     padding: 2px 0px 0px 12px;
     outline: none;
-    /* 去掉选中时的边框 */
     font-size: 16px;
-    /* 设置文本大小，可以根据需要更改值 */
     line-height: 40px;
-    /* 设置行高，使文本垂直居中，可以根据需要更改值 */
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+    color: var(--font-color);
 }
 
-.dark-mode .search-input {
-    background-color: #a0a0a0;
+html.dark-mode .search-input {
+    background: var(--glass-background-dark);
+    border-color: var(--glass-border-dark);
 }
 
 /* 搜索按钮样式 */
@@ -1228,15 +1038,15 @@ div.aplayer-pic {
     background-color: var(--tertiary-color);
 }
 
-.dark-mode .search-button {
+html.dark-mode .search-button {
     background-color: var(--dark-mode-color);
 }
 
-.dark-mode .search-button:hover {
+html.dark-mode .search-button:hover {
     background-color: var(--dark-mode-hover);
 }
 
-.dark-mode .search-button:active {
+html.dark-mode .search-button:active {
     background-color: var(--dark-mode-active);
 }
 
@@ -1247,16 +1057,13 @@ div.aplayer-pic {
     justify-content: center;
     width: 100%;
     margin: auto;
-    /* Center horizontally */
 }
 
 .cardItem {
     flex: 1;
-    /* 占满剩余空间 */
     display: none;
     flex-direction: row;
     padding: 0px auto;
-    /* border: 1px solid #ccc; */
     border-radius: 12px;
     margin-bottom: 10px;
     box-sizing: border-box;
@@ -1266,9 +1073,7 @@ div.aplayer-pic {
 .cardItem.active {
     display: flex;
     width: 87%;
-    /* 占满整个父容器的宽度 */
     height: 100%;
-    /* 占满整个父容器的高度 */
     margin-bottom: 0;
     margin-left: 3%;
 }
@@ -1317,7 +1122,6 @@ div.aplayer-pic {
     align-items: center;
     box-sizing: border-box;
     padding: 10px;
-    /* border: 1px solid #ccc; */
     text-decoration: none;
     color: var(--font-color);
     width: 100%;
@@ -1334,44 +1138,216 @@ div.aplayer-pic {
 .navButtons {
     display: flex;
     justify-content: center;
-    /* 让按钮居中 */
     gap: 50px;
-    /* 设置按钮之间的间隔为 10px */
     width: 100%;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-.navButton {
-    cursor: pointer;
-    padding: 10px 0;
-    border: none;
-    position: relative;
+.navButton.current {
+    font-weight: bold;
 }
 
-.navButton::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
+/* 调整 main 容器和导航页面的宽度 */
+main.container {
+    width: calc(100% - 20px);
+    max-width: 1300px;
+    margin: 10px auto;
+}
+
+/* 修复在大屏幕下的居中问题 */
+@media (min-width: 1340px) {
+    header, 
+    main.container {
+        margin-left: auto;
+        margin-right: auto;
+        width: 1300px;
+    }
+}
+
+#navpage .card {
+    margin-bottom: 0;
+}
+
+/* 优化滚动条样式 */
+::-webkit-scrollbar {
+    width: 12px;  /* 增加宽度 */
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);  /* 更透明的轨道 */
+    border-radius: 6px;
+    margin: 5px;  /* 添加边距 */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);  /* 使用主题色 */
+    border-radius: 6px;
+    border: 3px solid transparent;  /* 添加透明边框 */
+    background-clip: padding-box;  /* 使边框透明 */
+    min-height: 40px;  /* 最小高度 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);  /* 悬停时变色 */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* 深色模式滚动条样式 */
+html.dark-mode::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+html.dark-mode::-webkit-scrollbar-thumb {
+    background: var(--dark-mode-color);  /* 使用深色模式的橙色主题 */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+
+html.dark-mode::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-mode-hover);  /* 使用深色模式的橙色悬停色 */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* 加载动画容器 */
+.loading-container {
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 2px;
-    background-color: transparent;
+    height: 100%;
+    background: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.loading-container.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* 加载动画 */
+.loading-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 50px;  /* 添加固定高度 */
+}
+
+/* 弹跳圆圈 */
+.circle {
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: bounce 0.5s cubic-bezier(0.19, 0.57, 0.3, 0.98) infinite alternate;
+    position: relative;  /* 修改为相对定位 */
+}
+
+/* 阴影效果 */
+.shadow {
+    width: 20px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 0 10px;
+    position: absolute;
+    bottom: -10px;
+    animation: shadow 0.5s cubic-bezier(0.19, 0.57, 0.3, 0.98) infinite alternate;
+}
+
+/* 调整阴影位置 */
+.shadow:nth-child(4) {
+    left: 0;  /* 第一个阴影 */
+}
+.shadow:nth-child(5) {
+    left: 40px;  /* 第二个阴影 */
+}
+.shadow:nth-child(6) {
+    left: 80px;  /* 第三个阴影 */
+}
+
+/* 延迟动画效果 */
+.circle:nth-child(1), .shadow:nth-child(4) {
+    animation-delay: -0.2s;
+}
+
+.circle:nth-child(2), .shadow:nth-child(5) {
+    animation-delay: -0.1s;
+}
+
+.circle:nth-child(3), .shadow:nth-child(6) {
+    animation-delay: 0s;
+}
+
+/* 深色模式样式 */
+html.dark-mode .circle {
+    background: var(--dark-mode-color);
+}
+
+html.dark-mode .shadow {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 弹跳动画 */
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-30px);
+    }
+}
+
+/* 阴影动画 */
+@keyframes shadow {
+    from {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    to {
+        transform: scale(0.7);
+        opacity: 0.3;
+    }
+}
+
+/* 轮播指示器容器 */
+.carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+}
+
+/* 指示器圆点样式 */
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.navButton.current::before {
-    background-color: var(--primary-color);
+.carousel-dot.active {
+    background: rgba(255, 255, 255, 0.9);
 }
 
-body.dark-mode .navButton.current::before {
-    background-color: var(--dark-mode-color);
+html.dark-mode .carousel-dot {
+    background: rgba(0, 0, 0, 0.5);
 }
 
-.navButton:hover::before {
-    background-color: var(--font-color);
-}
-
-.navButton.current {
-    font-weight: bold;
+html.dark-mode .carousel-dot.active {
+    background: rgba(0, 0, 0, 0.9);
 }

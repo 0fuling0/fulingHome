@@ -12,7 +12,7 @@
     <meta name="theme-color" id="theme-color-meta" content="">
     <meta name="description" content="Fuling Chen - 个人主页">
     <title>Fuling Chen - 个人主页</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
     <link rel="icon" type="image/webp" sizes="64x64"
         href="https://gcore.jsdelivr.net/gh/0fuling0/mysource@main/img/favicon.webp">
@@ -20,17 +20,49 @@
     <script defer src="https://cdn.jsdelivr.net/npm/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
     <script defer src="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
     <script defer src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
-    <script async src="https://npm.elemecdn.com/penndu@1.0.0/bsz.js"></script>
+    <meta name="color-scheme" content="light dark">
+    <script defer>
+        // 立即执行的深色模式初始化
+        (function() {
+            let darkMode = false;
+            const html = document.documentElement;
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // 按优先级检查深色模式状态
+            if (localStorage.getItem('darkMode') !== null) {
+                darkMode = localStorage.getItem('darkMode') === 'true';
+            } else if (prefersDarkMode) {
+                darkMode = true;
+            }
+            
+            // 立即应用主题
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                if (document.body) {
+                    document.body.classList.add('dark-mode');
+                }
+            } else {
+                html.classList.add('light');
+                if (document.body) {
+                    document.body.classList.add('light');
+                }
+            }
+        })();
+    </script>
 </head>
 
-<body class="light">
+<body>
     <div class="loading-container">
-        <div class="loading-spinner-wrapper">
-            <div class="loading-spinner"></div>
-            <div class="loading-text"></div>
+        <div class="loading-animation">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="shadow"></div>
+            <div class="shadow"></div>
+            <div class="shadow"></div>
         </div>
     </div>
-
+    <!-- 删除了加载动画容器 -->
     <header>
         <h1>Fuling's Homepage</h1>
         <p class="motto">休言万事转头空，未转头时皆梦。</p>
@@ -89,7 +121,7 @@
     <button id="backToBottom" class="back-to-bottom-button" aria-label="返回底部"><i class="fas fa-arrow-down"></i></button>
     <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="切换夜间模式"><i class="fas fa-moon"></i></button>
 
-    <script src="js/script.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 
 </html>
